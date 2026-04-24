@@ -25,6 +25,13 @@ from dashboard.utils import (
     risk_level,
 )
 
+# ── Display constants ─────────────────────────────────────────────────────────
+SCATTER_SAMPLE_SIZE = 3000
+DIST_SAMPLE_SIZE = 3000
+MAX_DISPLAY_AMOUNT = 2000        # clip threshold for amount distribution chart
+FRAUD_RISK_RANGE = (0.6, 0.99)   # fallback risk range when model absent (fraud)
+NORMAL_RISK_RANGE = (0.01, 0.4)  # fallback risk range when model absent (normal)
+
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="FraudGuard – Credit Card Fraud Dashboard",
@@ -196,13 +203,13 @@ if artifact and "risk_score" not in df.columns:
         df["risk_score"] = model.predict_proba(X)[:, 1]
     except Exception:
         df["risk_score"] = np.where(df["Class"] == 1,
-                                    np.random.uniform(0.6, 0.99, len(df)),
-                                    np.random.uniform(0.01, 0.4, len(df)))
+                                    np.random.uniform(*FRAUD_RISK_RANGE, len(df)),
+                                    np.random.uniform(*NORMAL_RISK_RANGE, len(df)))
 else:
     if "risk_score" not in df.columns:
         df["risk_score"] = np.where(df["Class"] == 1,
-                                    np.random.uniform(0.6, 0.99, len(df)),
-                                    np.random.uniform(0.01, 0.4, len(df)))
+                                    np.random.uniform(*FRAUD_RISK_RANGE, len(df)),
+                                    np.random.uniform(*NORMAL_RISK_RANGE, len(df)))
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -538,7 +545,7 @@ elif page == "🎯 Risk & Transactions":
 
     with col1:
         st.markdown('<div class="section-header">Amount vs Risk Score</div>', unsafe_allow_html=True)
-        sample = df.sample(min(3000, len(df)), random_state=42)
+        sample = df.sample(min(SCATTER_SAMPLE_SIZE, len(df)), random_state=42)
         scatter = px.scatter(
             sample,
             x="Amount",
@@ -555,8 +562,8 @@ elif page == "🎯 Risk & Transactions":
 
     with col2:
         st.markdown('<div class="section-header">Fraud vs Normal Amount Distribution</div>', unsafe_allow_html=True)
-        fraud_amt = df[df["Class"] == 1]["Amount"].clip(upper=2000)
-        normal_amt = df[df["Class"] == 0]["Amount"].clip(upper=2000).sample(3000, random_state=1)
+        fraud_amt = df[df["Class"] == 1]["Amount"].clip(upper=MAX_DISPLAY_AMOUNT)
+        normal_amt = df[df["Class"] == 0]["Amount"].clip(upper=MAX_DISPLAY_AMOUNT).sample(DIST_SAMPLE_SIZE, random_state=1)
         dist_fig = go.Figure()
         dist_fig.add_trace(go.Histogram(
             x=normal_amt, name="Normal", nbinsx=60,

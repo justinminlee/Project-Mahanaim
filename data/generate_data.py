@@ -11,6 +11,7 @@ np.random.seed(42)
 
 N = 50_000
 FRAUD_BASE_RATE = 0.07  # ~7% base fraud rate for demo visibility
+TIME_WINDOW_SECONDS = 48 * 3600  # 48-hour simulation window
 
 PAYMENT_TYPES = ["Credit Card", "Apple Pay", "Google Pay", "Samsung Pay", "Debit Card"]
 COUNTRIES = ["US", "UK", "Germany", "France", "Canada", "China", "Japan", "Brazil", "Russia", "Nigeria", "Romania"]
@@ -61,7 +62,7 @@ def generate_dataset(n: int = N, output_path: str = "data/creditcard_enriched.cs
     print(f"Generating {n:,} synthetic transactions...")
 
     # ── Time & derived temporal features ─────────────────────────────────────
-    time_seconds = np.random.uniform(0, 172_800, n).astype(int)  # 0 – 48 h
+    time_seconds = np.random.uniform(0, TIME_WINDOW_SECONDS, n).astype(int)
     hour = (time_seconds // 3600) % 24
     day_of_week = np.random.randint(0, 7, n)  # 0=Monday … 6=Sunday
     is_weekend = (day_of_week >= 5).astype(int)

@@ -26,6 +26,13 @@ sys.path.insert(0, str(ROOT))
 DATA_PATH = ROOT / "data" / "creditcard_enriched.csv"
 MODEL_PATH = ROOT / "models" / "fraud_model.pkl"
 
+# Training configuration
+TEST_SIZE = 0.20
+RANDOM_STATE = 42
+RF_N_ESTIMATORS = 150
+RF_MAX_DEPTH = 12
+RF_MIN_SAMPLES_LEAF = 5
+
 CATEGORICAL_FEATURES = ["user_type", "payment_type", "country", "merchant_category"]
 NUMERIC_FEATURES = [
     "Amount", "hour", "is_weekend", "small_tx_sequence",
@@ -59,18 +66,18 @@ def train(df: pd.DataFrame):
     y = df["Class"]
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.20, random_state=42, stratify=y
+        X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y
     )
 
     print(f"Training on {len(X_train):,} samples, testing on {len(X_test):,} samples …")
 
     clf = RandomForestClassifier(
-        n_estimators=150,
-        max_depth=12,
-        min_samples_leaf=5,
+        n_estimators=RF_N_ESTIMATORS,
+        max_depth=RF_MAX_DEPTH,
+        min_samples_leaf=RF_MIN_SAMPLES_LEAF,
         class_weight="balanced",
         n_jobs=-1,
-        random_state=42,
+        random_state=RANDOM_STATE,
     )
     clf.fit(X_train, y_train)
 
