@@ -1,0 +1,4 @@
+data/creditcard_enriched.csv
+models/fraud_model.pkl
+__pycache__/
+*.pyc
