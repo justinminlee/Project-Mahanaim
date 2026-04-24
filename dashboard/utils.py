@@ -25,7 +25,7 @@ MODEL_PATH = ROOT / "models" / "fraud_model.pkl"
 @st.cache_data(show_spinner="Loading transaction data …")
 def load_data() -> pd.DataFrame:
     if not DATA_PATH.exists():
-        st.info("Generating synthetic dataset – this takes ~30 seconds …")
+        st.info("Generating synthetic dataset – this takes ~30 seconds…")
         from data.generate_data import generate_dataset
         generate_dataset(output_path=str(DATA_PATH))
     df = pd.read_csv(DATA_PATH)

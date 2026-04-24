@@ -44,7 +44,7 @@ ALL_FEATURES = NUMERIC_FEATURES + [f"{c}_encoded" for c in CATEGORICAL_FEATURES]
 
 def load_or_generate_data() -> pd.DataFrame:
     if not DATA_PATH.exists():
-        print("Dataset not found – generating synthetic data …")
+        print("Dataset not found – generating synthetic data…")
         from data.generate_data import generate_dataset
         generate_dataset(output_path=str(DATA_PATH))
     return pd.read_csv(DATA_PATH)
@@ -69,7 +69,7 @@ def train(df: pd.DataFrame):
         X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y
     )
 
-    print(f"Training on {len(X_train):,} samples, testing on {len(X_test):,} samples …")
+    print(f"Training on {len(X_train):,} samples, testing on {len(X_test):,} samples…")
 
     clf = RandomForestClassifier(
         n_estimators=RF_N_ESTIMATORS,
